@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23b3261e%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2218%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22%3EN%3C/text%3E%3C/svg%3E">
 <title>Kho Tục Ngữ, Thành Ngữ, Ca Dao Việt Nam</title>
@@ -14,18 +15,6 @@
   --tn:#2f7d4a; --tng:#b3261e; --cd:#6a48b0; --khac:#6f6556; --badge-ink:#fff;
   --ai:#2f5d8a; --ai-soft:#e3edf7; --chip:#efe7d7;
   --shadow:0 1px 0 var(--line), 0 6px 18px rgba(60,40,10,.06);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#16130f; --paper:#201c17; --ink:#f1eadf; --muted:#a89d8b; --line:#3a332a;
-    --red:#ff7a6e; --red-soft:#3d1f1c; --tn:#63c48a; --tng:#ff7a6e; --cd:#b49cf2; --khac:#a89d8b; --badge-ink:#16130f;
-    --ai:#8fbcec; --ai-soft:#1b2a3a; --chip:#2b261f; --shadow:0 1px 0 var(--line);
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#16130f; --paper:#201c17; --ink:#f1eadf; --muted:#a89d8b; --line:#3a332a;
-  --red:#ff7a6e; --red-soft:#3d1f1c; --tn:#63c48a; --tng:#ff7a6e; --cd:#b49cf2; --khac:#a89d8b; --badge-ink:#16130f;
-  --ai:#8fbcec; --ai-soft:#1b2a3a; --chip:#2b261f; --shadow:0 1px 0 var(--line);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -142,9 +131,6 @@ header{position:sticky;top:0;z-index:6;background:var(--bg);padding:10px 0}
       <h1>Kho <span>Tục Ngữ, Thành Ngữ, Ca Dao</span> Việt Nam</h1>
       <div class="sub" id="stats"></div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" id="btnTheme" title="Đổi nền sáng/tối">◐</button>
-    </div>
   </header>
 
   <section class="today" id="today"></section>
@@ -200,10 +186,6 @@ header{position:sticky;top:0;z-index:6;background:var(--bg);padding:10px 0}
 (function(){
 const D = window.DATA || [], NG = window.NGUON || {};
 const $ = s => document.querySelector(s);
-const store = {
-  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-};
 const fold = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").toLowerCase();
 const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const loaiCls = l => l==="thành ngữ"?"b-tn":l==="tục ngữ"?"b-tng":l==="ca dao"?"b-cd":"b-x";
@@ -426,7 +408,8 @@ function today(){
     <div class="m">${esc(meaning(e))}</div></div>
     <button class="btn primary" id="tBtn">Xem câu khác</button>`;
   $("#tq").onclick=()=>show(e.id);
-  $("#tBtn").onclick=()=>{today(); show(lastRand.id);};   // đổi câu và mở luôn chi tiết bên dưới
+  // đổi câu; máy tính thì mở luôn chi tiết bên phải, điện thoại chỉ đổi câu (bấm vào câu mới mở chi tiết)
+  $("#tBtn").onclick=()=>{today(); if(!matchMedia("(max-width:860px)").matches) show(lastRand.id);};
 }
 
 // sự kiện
@@ -436,8 +419,6 @@ $("#fChuDe").onchange=ev=>{st.chuDe=ev.target.value;st.shown=60;render();};
 $("#fSacThai").onchange=ev=>{st.sac=ev.target.value;st.shown=60;render();};
 $("#fPhoBien").onchange=ev=>{st.pho=ev.target.value;st.shown=60;render();};
 $("#more").onclick=()=>{st.shown+=60;render();};
-const th=store.get("theme",null); if(th) document.documentElement.dataset.theme=th;
-$("#btnTheme").onclick=()=>{const dark=matchMedia("(prefers-color-scheme: dark)").matches;const cur=document.documentElement.dataset.theme||(dark?"dark":"light");const nx=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=nx;store.set("theme",nx);};
 today(); render();
 // đo chiều cao phần dính để phần chi tiết bên phải không bị che
 (function(){
