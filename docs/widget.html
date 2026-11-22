@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Widget Kho Tục Ngữ</title>
+<style>
+:root{
+  --bg:#f6f1e7; --paper:#fffdf8; --ink:#1f1a14; --muted:#6f6556; --line:#e3d9c6; --red:#b3261e;
+  --tng:#b3261e; --tn:#2f7d4a; --cd:#6a48b0;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#16130f; --paper:#201c17; --ink:#f1eadf; --muted:#a89d8b; --line:#3a332a; --red:#ff7a6e;
+  --tng:#ff7a6e; --tn:#63c48a; --cd:#b49cf2;
+}}
+:root[data-theme="dark"]{
+  --bg:#16130f; --paper:#201c17; --ink:#f1eadf; --muted:#a89d8b; --line:#3a332a; --red:#ff7a6e;
+  --tng:#ff7a6e; --tn:#63c48a; --cd:#b49cf2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:24px;line-height:1.3;margin:0 0 6px}
+h1 span{color:var(--red)}
+.sub{color:var(--muted);margin:0 0 22px;font-size:15px}
+h2{font-size:17px;margin:28px 0 10px}
+/* khung xem trước: tỉ lệ widget vừa (4x2) */
+.wg{width:100%;max-width:338px;aspect-ratio:338/158;background:var(--paper);border-radius:22px;padding:14px 16px;
+  box-shadow:0 1px 0 var(--line),0 10px 30px rgba(60,40,10,.12);display:flex;flex-direction:column;overflow:hidden;cursor:pointer;text-decoration:none;color:inherit}
+.wg .top{display:flex;align-items:center;gap:6px;font-size:11px}
+.wg .lb{color:var(--red);font-weight:700;font-size:10px;letter-spacing:.02em;margin-right:auto}
+.wg .st{color:var(--red)}
+.wg .body{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;padding-top:4px}
+.wg .c{font-weight:600;line-height:1.2;white-space:pre-line}
+.wg .m{color:var(--muted);font-size:12px;line-height:1.25;margin-top:5px;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 16px;font:inherit;font-size:15px;cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
+.ok{color:var(--tn);font-size:14px}
+ol{padding-left:22px;margin:0}
+ol li{margin:0 0 12px}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+code{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:14px}
+textarea{width:100%;height:120px;margin-top:10px;font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;display:none}
+a{color:var(--red)}
+</style>
+</head>
+<body>
+<main>
+<h1>Widget <span>Câu ngẫu nhiên</span> cho iPhone</h1>
+<p class="sub">Mỗi lần iPhone làm mới, widget hiện một câu tục ngữ, thành ngữ hoặc ca dao thông dụng. Bấm vào widget để xem nghĩa, cách dùng, ví dụ trên <a href="./">Kho Tục Ngữ</a>.</p>
+
+<a class="wg" id="wg" href="./" aria-label="Xem trước widget">
+  <div class="top"><span class="lb">CÂU NGẪU NHIÊN</span><span id="wl"></span><span class="st" id="ws"></span></div>
+  <div class="body"><div class="c" id="wc">Đang tải…</div>
+  <div class="m" id="wm"></div></div>
+</a>
+<div class="row"><button class="btn" id="again">Xem câu khác</button></div>
+
+<h2>Cài trong 3 phút</h2>
+<ol>
+  <li>Cài app <b>Scriptable</b> (miễn phí) trên App Store: <a href="https://apps.apple.com/app/scriptable/id1405459188">mở App Store</a>.</li>
+  <li>Bấm nút dưới đây để sao chép mã widget.
+    <div class="row"><button class="btn primary" id="copy" disabled>Sao chép mã</button><span class="ok" id="copied"></span></div>
+    <textarea id="code" readonly></textarea>
+  </li>
+  <li>Mở Scriptable, bấm dấu <b>+</b> ở góc trên, dán mã vào. Bấm vào tên ở trên cùng, đổi thành <b>Kho Tục Ngữ</b>, rồi bấm <b>Done</b>. Bấm nút ▶ để chạy thử, sẽ thấy widget hiện ra.</li>
+  <li>Ra màn hình chính, giữ tay vào chỗ trống đến khi các biểu tượng rung, bấm <b>+</b> (hoặc <b>Sửa → Thêm tiện ích</b>). Tìm <b>Scriptable</b>, vuốt sang cỡ <b>vừa</b> (ngang 4 ô, cao 2 ô), bấm <b>Thêm tiện ích</b>.</li>
+  <li>Giữ tay vào widget vừa thêm, chọn <b>Sửa tiện ích</b>. Ở mục <b>Script</b> chọn <b>Kho Tục Ngữ</b>. Xong.</li>
+</ol>
+
+<h2>Tùy chọn</h2>
+<p>Muốn chỉ hiện một loại: trong <b>Sửa tiện ích</b>, ô <b>Parameter</b> gõ <code>tục ngữ</code>, <code>thành ngữ</code> hoặc <code>ca dao</code>. Có thể thêm nhiều widget, mỗi cái một loại.</p>
+
+<div class="note"><b>Lưu ý:</b> iPhone tự quyết định lúc nào làm mới widget, thường khoảng 15 phút đến vài giờ một lần, nên câu không đổi theo giờ cố định. Widget tải dữ liệu một lần mỗi tuần và vẫn chạy khi mất mạng.</div>
+</main>
+<script>
+(function(){
+  const $=s=>document.getElementById(s);
+  const COL={"tục ngữ":"var(--tng)","thành ngữ":"var(--tn)","ca dao":"var(--cd)"};
+  let data=[];
+  function draw(){
+    const pool=data.filter(e=>e.c.split(" / ").length<=4&&e.c.length<=150);
+    if(!pool.length) return;
+    const e=pool[Math.floor(Math.random()*pool.length)];
+    const ls=e.c.split(" / ").map(s=>s.trim()).filter(Boolean);
+    const longest=Math.max(...ls.map(s=>s.length));
+    const size=ls.length>=4||e.c.length>110?13:ls.length===3||longest>34?15:longest<=24?20:17;
+    $("wc").textContent=ls.join("\n"); $("wc").style.fontSize=size+"px";
+    $("wl").textContent=e.l?e.l.charAt(0).toUpperCase()+e.l.slice(1):""; $("wl").style.color=COL[e.l]||"";
+    const p=Math.max(1,Math.min(3,e.p||1)); $("ws").textContent="★".repeat(p)+"☆".repeat(3-p);
+    $("wm").textContent=e.m||""; $("wm").style.webkitLineClamp=ls.length>=3?1:2;
+    $("wg").href="./?id="+encodeURIComponent(e.i);
+  }
+  fetch("widget.json").then(r=>r.json()).then(d=>{data=d;draw();}).catch(()=>{$("wc").textContent="Chưa tải được dữ liệu.";});
+  $("again").onclick=draw;
+
+  // mã widget nạp sẵn để bấm sao chép là chép ngay (Safari trên iPhone chỉ cho chép trong lúc bấm)
+  let code="";
+  fetch("widget-kho-tuc-ngu.js").then(r=>r.text()).then(t=>{code=t;$("code").value=t;$("copy").disabled=false;})
+    .catch(()=>{$("copied").textContent="Chưa tải được mã, thử tải lại trang.";});
+  function fallback(){const ta=$("code");ta.style.display="block";ta.focus();ta.select();ta.setSelectionRange(0,code.length);
+    let ok=false;try{ok=document.execCommand("copy");}catch(_){}
+    $("copied").textContent=ok?"Đã chép. Mở Scriptable để dán.":"Máy không cho tự chép: giữ tay vào ô mã bên dưới, chọn Chọn tất cả rồi Sao chép.";}
+  $("copy").onclick=()=>{
+    if(!code) return;
+    if(navigator.clipboard&&window.isSecureContext){
+      navigator.clipboard.writeText(code).then(()=>{$("copied").textContent="Đã chép. Mở Scriptable để dán.";},fallback);
+    } else fallback();
+  };
+})();
+</script>
+</body>
+</html>

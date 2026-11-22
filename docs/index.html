@@ -446,6 +446,8 @@ today(); render();
   measure(); if(window.ResizeObserver){const ro=new ResizeObserver(measure); ro.observe(hdr); ro.observe(bar);} else addEventListener("resize",measure);
   addEventListener("scroll",()=>bar.classList.toggle("stuck",scrollY>0&&bar.getBoundingClientRect().top<=parseFloat(getComputedStyle(root).getPropertyValue("--hh"))+1),{passive:true});
 })();
+// link mở thẳng một câu: ...index.html?id=vd00123 (widget iPhone dùng link này)
+try{const pid=new URLSearchParams(location.search).get("id"); if(pid&&byId[pid]) show(pid);}catch(_){}
 })();
 </script>
 </body>

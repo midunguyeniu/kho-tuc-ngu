@@ -12,3 +12,7 @@
 /docs/*
 !/docs/index.html
 !/docs/data.js
+# Widget iPhone (Scriptable): gói dữ liệu nhỏ lấy từ bản chia sẻ, script widget, trang hướng dẫn cài
+!/docs/widget.json
+!/docs/widget.html
+!/docs/widget-kho-tuc-ngu.js
