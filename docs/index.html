@@ -389,11 +389,12 @@ function show(id,via,fromList){
 }
 // đưa câu đang xem lên đầu danh sách bên trái (mở thêm trang nếu câu nằm xa; câu bị bộ lọc ẩn thì thôi)
 function revealInList(id){
+  // điện thoại: chi tiết che kín màn hình, giữ nguyên chỗ đang cuộn để bấm "Quay lại" về đúng chỗ cũ
+  if(getComputedStyle($("#listpane")).overflowY!=="auto") return;
   const idx=results.findIndex(x=>x.id===id); if(idx<0) return;
   if(idx>=st.shown){ st.shown=Math.ceil((idx+1)/60)*60; render(); }
   const el=$("#list").querySelector(`[data-id="${id}"]`), pane=$("#listpane"); if(!el) return;
-  if(getComputedStyle(pane).overflowY==="auto") pane.scrollTop+=el.getBoundingClientRect().top-pane.getBoundingClientRect().top-2;
-  else el.scrollIntoView({block:"start"});
+  pane.scrollTop+=el.getBoundingClientRect().top-pane.getBoundingClientRect().top-2;
 }
 // câu ngẫu nhiên: ưu tiên câu thông dụng có cách dùng; bấm "Xem câu khác" để đổi câu, bấm vào câu để xem chi tiết
 let lastRand=null;
