@@ -8,7 +8,7 @@
 <style>
 :root{
   --bg:#f6f1e7; --paper:#fffdf8; --ink:#1f1a14; --muted:#6f6556; --line:#e3d9c6; --red:#b3261e;
-  --tng:#b3261e; --tn:#2f7d4a; --cd:#6a48b0;
+  --tng:#b3261e; --tn:#2f7d4a; --cd:#6a48b0; --ex:#2f5d8a;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
@@ -25,7 +25,9 @@ h2{font-size:17px;margin:28px 0 10px}
 .wg .st{color:var(--red)}
 .wg .body{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;padding-top:4px}
 .wg .c{font-weight:600;line-height:1.2;white-space:pre-line}
-.wg .m{color:var(--muted);font-size:12px;line-height:1.25;margin-top:5px;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.wg .m,.wg .v{font-size:12px;line-height:1.25;margin-top:5px;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.wg .m{color:var(--muted)}
+.wg .v{color:var(--ex);font-style:italic;margin-top:4px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
 .btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 16px;font:inherit;font-size:15px;cursor:pointer}
 .btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:600}
@@ -42,12 +44,13 @@ a{color:var(--red)}
 <body>
 <main>
 <h1>Widget <span>Câu ngẫu nhiên</span> cho iPhone</h1>
-<p class="sub">Mỗi lần iPhone làm mới, widget hiện một câu tục ngữ, thành ngữ hoặc ca dao thông dụng. Bấm vào widget để xem nghĩa, cách dùng, ví dụ trên <a href="./">Kho Tục Ngữ</a>.</p>
+<p class="sub">Mỗi lần iPhone làm mới, widget hiện một câu tục ngữ, thành ngữ hoặc ca dao thông dụng, kèm nghĩa và ví dụ. Bấm vào widget để xem nghĩa, cách dùng, ví dụ trên <a href="./">Kho Tục Ngữ</a>.</p>
 
 <a class="wg" id="wg" href="./" aria-label="Xem trước widget">
   <div class="top"><span class="lb">CÂU NGẪU NHIÊN</span><span id="wl"></span><span class="st" id="ws"></span></div>
   <div class="body"><div class="c" id="wc">Đang tải…</div>
-  <div class="m" id="wm"></div></div>
+  <div class="m" id="wm"></div>
+  <div class="v" id="wv"></div></div>
 </a>
 <div class="row"><button class="btn" id="again">Xem câu khác</button></div>
 
@@ -83,7 +86,9 @@ a{color:var(--red)}
     $("wc").textContent=ls.join("\n"); $("wc").style.fontSize=size+"px";
     $("wl").textContent=e.l?e.l.charAt(0).toUpperCase()+e.l.slice(1):""; $("wl").style.color=COL[e.l]||"";
     const p=Math.max(1,Math.min(3,e.p||1)); $("ws").textContent="★".repeat(p)+"☆".repeat(3-p);
-    $("wm").textContent=e.m||""; $("wm").style.webkitLineClamp=ls.length>=3?1:2;
+    const short=ls.length===1&&longest<=30;
+    $("wm").textContent=e.m||""; $("wm").style.webkitLineClamp=short?2:1;
+    $("wv").textContent=e.v?"“"+e.v.replace(/^[“"']+|[”"']+$/g,"")+"”":""; $("wv").style.webkitLineClamp=ls.length>=3?1:2;
     $("wg").href="./?id="+encodeURIComponent(e.i);
   }
   fetch("widget.json").then(r=>r.json()).then(d=>{data=d;draw();}).catch(()=>{$("wc").textContent="Chưa tải được dữ liệu.";});

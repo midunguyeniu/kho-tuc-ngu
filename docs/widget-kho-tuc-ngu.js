@@ -12,6 +12,7 @@ const C = {
   ink: Color.dynamic(new Color("#1f1a14"), new Color("#f1eadf")),
   muted: Color.dynamic(new Color("#6f6556"), new Color("#a89d8b")),
   accent: Color.dynamic(new Color("#b3261e"), new Color("#ff7a6e")),
+  ex: Color.dynamic(new Color("#2f5d8a"), new Color("#8fbcec")),
   "tục ngữ": Color.dynamic(new Color("#b3261e"), new Color("#ff7a6e")),
   "thành ngữ": Color.dynamic(new Color("#2f7d4a"), new Color("#63c48a")),
   "ca dao": Color.dynamic(new Color("#6a48b0"), new Color("#b49cf2")),
@@ -21,25 +22,32 @@ const fm = FileManager.local();
 const dir = fm.joinPath(fm.documentsDirectory(), "kho-tuc-ngu");
 const cachePath = fm.joinPath(dir, "widget.json");
 
+// dữ liệu hợp lệ: có câu và có trường ví dụ (bản lưu cũ chưa có ví dụ thì tải lại)
+const valid = (a) => Array.isArray(a) && a.length > 0 && "v" in a[0];
+
+function readCache() {
+  try { const a = JSON.parse(fm.readString(cachePath)); return valid(a) ? a : null; } catch (e) { return null; }
+}
+
 async function loadData() {
   if (!fm.fileExists(dir)) fm.createDirectory(dir, true);
-  const has = fm.fileExists(cachePath);
-  const fresh = has && Date.now() - fm.modificationDate(cachePath).getTime() < MAX_AGE;
+  const cached = fm.fileExists(cachePath) ? readCache() : null;
+  const fresh = cached && Date.now() - fm.modificationDate(cachePath).getTime() < MAX_AGE;
   if (!fresh) {
     try {
       const req = new Request(DATA_URL);
       req.timeoutInterval = 15;
       const txt = await req.loadString();
       const arr = JSON.parse(txt);
-      if (Array.isArray(arr) && arr.length) {
+      if (valid(arr)) {
         fm.writeString(cachePath, txt);
         return arr;
       }
     } catch (e) { /* mất mạng: dùng bản đã lưu */ }
   }
-  if (has) {
-    try { return JSON.parse(fm.readString(cachePath)); } catch (e) { /* hỏng thì coi như chưa có */ }
-  }
+  if (cached) return cached;
+  // mất mạng và bản lưu cũ chưa có ví dụ: vẫn hiện câu, chỉ thiếu ví dụ
+  try { const a = JSON.parse(fm.readString(cachePath)); if (Array.isArray(a) && a.length) return a; } catch (e) {}
   return null;
 }
 
@@ -104,13 +112,22 @@ function buildWidget(e) {
 
   w.addSpacer(5);
 
-  // nghĩa / cách dùng (2 dòng)
+  // nghĩa và ví dụ: câu càng ngắn thì càng nhiều dòng cho nghĩa/ví dụ
+  const short = ls.length === 1 && longest <= 30;
   if (e.m) {
     const mt = w.addText(e.m);
     mt.font = Font.systemFont(12);
     mt.textColor = C.muted;
-    mt.lineLimit = ls.length >= 3 ? 1 : 2;
+    mt.lineLimit = short ? 2 : 1;
     mt.minimumScaleFactor = 0.85;
+  }
+  if (e.v) {
+    w.addSpacer(4);
+    const vt = w.addText("“" + e.v.replace(/^[“"']+|[”"']+$/g, "") + "”");
+    vt.font = Font.italicSystemFont(12);
+    vt.textColor = C.ex;
+    vt.lineLimit = ls.length >= 3 ? 1 : 2;
+    vt.minimumScaleFactor = 0.85;
   }
   w.addSpacer();
   return w;
