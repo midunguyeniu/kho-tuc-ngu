@@ -39,6 +39,13 @@ ol li{margin:0 0 12px}
 code{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:14px}
 textarea{width:100%;height:120px;margin-top:10px;font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;display:none}
 a{color:var(--red)}
+/* xem trước màn hình khóa: nền tối như hình nền, chữ trắng; khung chữ nhật ~ 160x72 */
+.lock{max-width:338px;border-radius:22px;padding:18px 16px 22px;background:linear-gradient(160deg,#2c3e57,#121a26);color:#fff;text-align:center;margin-bottom:14px}
+.lock .lt{font-size:13px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lock .clock{font-size:64px;font-weight:600;line-height:1.05;letter-spacing:-1px}
+.lock .lr{display:block;width:160px;height:72px;margin:8px auto 0;text-align:left;color:#fff;text-decoration:none;overflow:hidden}
+.lock .lr .c{font-weight:600;font-size:14px;line-height:1.2;white-space:pre-line;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.lock .lr .m{font-size:12px;line-height:1.2;opacity:.75;margin-top:2px;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
 </style>
 </head>
 <body>
@@ -66,6 +73,20 @@ a{color:var(--red)}
   <li>Giữ tay vào widget vừa thêm, chọn <b>Sửa tiện ích</b>. Ở mục <b>Script</b> chọn <b>Kho Tục Ngữ</b>. Xong.</li>
 </ol>
 
+<h2>Thêm lên màn hình khóa (iOS 16 trở lên)</h2>
+<div class="lock" aria-label="Xem trước widget màn hình khóa">
+  <div class="lt" id="li">Nói dối như Cuội</div>
+  <div class="clock">9:41</div>
+  <a class="lr" id="lr" href="./"><div class="c" id="lc">Đang tải…</div><div class="m" id="lm"></div></a>
+</div>
+<ol>
+  <li>Đã làm xong bước 1–3 ở trên (cùng một mã cho cả màn hình chính và màn hình khóa).</li>
+  <li>Mở khóa bằng Face ID nhưng vẫn ở màn hình khóa, giữ tay vào màn hình, bấm <b>Tùy chỉnh</b> rồi chọn <b>Màn hình khóa</b>.</li>
+  <li>Bấm vào ô widget <b>dưới đồng hồ</b>, tìm <b>Scriptable</b>, chọn khung <b>chữ nhật</b> (khung dài nhất). Muốn thêm câu ngắn một dòng thì bấm vào dòng ngày tháng <b>phía trên đồng hồ</b> rồi chọn Scriptable.</li>
+  <li>Bấm vào widget Scriptable vừa thêm, ở mục <b>Script</b> chọn <b>Kho Tục Ngữ</b>. Bấm <b>Xong</b>.</li>
+</ol>
+<p>Màu chữ trên màn hình khóa do iPhone tự chọn theo hình nền. Khung chữ nhật chỉ đủ chỗ cho câu và nghĩa ngắn, không có ví dụ.</p>
+
 <h2>Tùy chọn</h2>
 <p>Muốn chỉ hiện một loại: trong <b>Sửa tiện ích</b>, ô <b>Parameter</b> gõ <code>tục ngữ</code>, <code>thành ngữ</code> hoặc <code>ca dao</code>. Có thể thêm nhiều widget, mỗi cái một loại. Thông báo cũng chỉ gửi loại câu đó.</p>
 <p>Không muốn nhận thông báo: vào <b>Cài đặt → Scriptable → Thông báo</b>, tắt <b>Cho phép thông báo</b>. Muốn đổi giờ: trong mã, sửa dòng <code>NOTIFY_TIMES</code> ở gần đầu, ví dụ <code>["07:30"]</code> là mỗi ngày một lần lúc 7:30.</p>
@@ -91,6 +112,12 @@ a{color:var(--red)}
     $("wm").textContent=e.m||""; $("wm").style.webkitLineClamp=short?2:1;
     $("wv").textContent=e.v?"“"+e.v.replace(/^[“"']+|[”"']+$/g,"")+"”":""; $("wv").style.webkitLineClamp=ls.length>=3?1:2;
     $("wg").href="./?id="+encodeURIComponent(e.i);
+    // màn hình khóa: câu ngắn hơn (khung chữ nhật tối đa 2 dòng/70 ký tự, một dòng tối đa 28 ký tự)
+    const rp=data.filter(e=>e.c.split(" / ").length<=2&&e.c.length<=70), ip=data.filter(e=>e.c.split(" / ").length===1&&e.c.length<=28);
+    if(rp.length){ const r=rp[Math.floor(Math.random()*rp.length)]; const rl=r.c.split(" / ");
+      $("lc").textContent=rl.join("\n"); $("lm").textContent=r.m||""; $("lm").style.webkitLineClamp=(rl.length===1&&r.c.length<=24)?2:1;
+      $("lr").href="./?id="+encodeURIComponent(r.i); }
+    if(ip.length) $("li").textContent=ip[Math.floor(Math.random()*ip.length)].c;
   }
   fetch("widget.json").then(r=>r.json()).then(d=>{data=d;draw();}).catch(()=>{$("wc").textContent="Chưa tải được dữ liệu.";});
   $("again").onclick=draw;

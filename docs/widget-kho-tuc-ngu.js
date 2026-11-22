@@ -1,5 +1,6 @@
 // Kho Tục Ngữ, Thành Ngữ, Ca Dao Việt Nam: widget "Câu ngẫu nhiên" cho app Scriptable (iPhone).
-// Cỡ widget: vừa (4x2). Bấm vào widget để mở câu đó trên trang tra cứu.
+// Cỡ widget: vừa (4x2) trên màn hình chính; trên màn hình khóa: khung chữ nhật, một dòng, hoặc khung tròn.
+// Bấm vào widget để mở câu đó trên trang tra cứu.
 // Tùy chọn (Parameter khi sửa widget): "tục ngữ", "thành ngữ" hoặc "ca dao" để chỉ hiện một loại.
 // Thông báo: mỗi ngày một câu ngẫu nhiên vào các giờ trong NOTIFY_TIMES. Không muốn nhận thì đổi thành [].
 
@@ -58,9 +59,9 @@ async function loadData() {
 const lines = (cau) => cau.split(" / ").map((s) => s.trim()).filter(Boolean);
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-function pick(data, param) {
-  // chỉ lấy câu vừa khung widget vừa: tối đa 4 dòng, không quá dài
-  let pool = data.filter((e) => e.c && lines(e.c).length <= 4 && e.c.length <= 150);
+function pick(data, param, maxLines = 4, maxLen = 150) {
+  // chỉ lấy câu vừa khung: mặc định cho widget vừa (tối đa 4 dòng, không quá dài); màn hình khóa chặt hơn
+  let pool = data.filter((e) => e.c && lines(e.c).length <= maxLines && e.c.length <= maxLen);
   const want = (param || "").trim().toLowerCase();
   if (want) {
     const f = pool.filter((e) => e.l === want);
@@ -137,6 +138,57 @@ function buildWidget(e) {
   return w;
 }
 
+// widget màn hình khóa (iOS 16+): iPhone tự tô màu theo hình nền, nên chỉ dùng chữ trắng + độ mờ
+function buildLockWidget(e, family) {
+  const w = new ListWidget();
+  w.refreshAfterDate = new Date(Date.now() + REFRESH_MIN * 60 * 1000);
+  if (e) w.url = BASE + "?id=" + encodeURIComponent(e.i);
+
+  if (family === "accessoryInline") {
+    // một dòng phía trên đồng hồ: chỉ có chỗ cho câu ngắn
+    const t = w.addText(e ? lines(e.c)[0] : "Kho Tục Ngữ");
+    t.font = Font.systemFont(12);
+    return w;
+  }
+  if (family === "accessoryCircular") {
+    // khung tròn quá nhỏ cho chữ: hiện biểu tượng, bấm vào mở một câu ngẫu nhiên
+    w.addAccessoryWidgetBackground = true;
+    w.addSpacer();
+    const row = w.addStack();
+    row.addSpacer();
+    const img = row.addImage(SFSymbol.named("quote.bubble").image);
+    img.imageSize = new Size(24, 24);
+    img.tintColor = Color.white();
+    row.addSpacer();
+    w.addSpacer();
+    return w;
+  }
+  // khung chữ nhật dưới đồng hồ: câu (tối đa 2 dòng) + nghĩa ngắn
+  w.setPadding(0, 0, 0, 0);
+  if (!e) {
+    const t = w.addText("Chưa tải được dữ liệu");
+    t.font = Font.systemFont(13);
+    return w;
+  }
+  const ls = lines(e.c);
+  const oneLine = ls.length === 1 && e.c.length <= 24;
+  const ct = w.addText(ls.join("\n"));
+  ct.font = Font.semiboldSystemFont(14);
+  ct.textColor = Color.white();
+  ct.lineLimit = 2;
+  ct.minimumScaleFactor = 0.7;
+  if (e.m) {
+    w.addSpacer(2);
+    const mt = w.addText(e.m);
+    mt.font = Font.systemFont(12);
+    mt.textColor = Color.white();
+    mt.textOpacity = 0.75;
+    mt.lineLimit = oneLine ? 2 : 1;
+  }
+  w.addSpacer();
+  return w;
+}
+
 // hẹn thông báo: mỗi giờ trong NOTIFY_TIMES của NOTIFY_DAYS ngày tới có một thông báo (mã theo ngày giờ).
 // Thông báo đã hẹn thì giữ nguyên, chỉ hẹn thêm chỗ còn trống, và bỏ những cái không còn trong danh sách giờ.
 function slotId(d) {
@@ -189,8 +241,17 @@ const data = await loadData();
 if (data) {
   try { await scheduleNotifications(data, args.widgetParameter); } catch (e) { /* chưa cho phép thông báo: bỏ qua */ }
 }
-const entry = data ? pick(data, args.widgetParameter) : null;
-const widget = buildWidget(entry);
+const family = config.widgetFamily;
+let widget;
+if (family === "accessoryRectangular") {
+  widget = buildLockWidget(data ? pick(data, args.widgetParameter, 2, 70) : null, family);
+} else if (family === "accessoryInline") {
+  widget = buildLockWidget(data ? pick(data, args.widgetParameter, 1, 28) : null, family);
+} else if (family === "accessoryCircular") {
+  widget = buildLockWidget(data ? pick(data, args.widgetParameter) : null, family);
+} else {
+  widget = buildWidget(data ? pick(data, args.widgetParameter) : null);
+}
 if (config.runsInWidget) {
   Script.setWidget(widget);
 } else {
