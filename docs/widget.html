@@ -44,7 +44,7 @@ a{color:var(--red)}
 <body>
 <main>
 <h1>Widget <span>Câu ngẫu nhiên</span> cho iPhone</h1>
-<p class="sub">Mỗi lần iPhone làm mới, widget hiện một câu tục ngữ, thành ngữ hoặc ca dao thông dụng, kèm nghĩa và ví dụ. Bấm vào widget để xem nghĩa, cách dùng, ví dụ trên <a href="./">Kho Tục Ngữ</a>.</p>
+<p class="sub">Mỗi lần iPhone làm mới, widget hiện một câu tục ngữ, thành ngữ hoặc ca dao thông dụng, kèm nghĩa và ví dụ. Mỗi ngày còn có 3 thông báo câu ngẫu nhiên lúc 8:00, 12:00 và 20:00. Bấm vào widget hoặc thông báo để xem nghĩa, cách dùng, ví dụ trên <a href="./">Kho Tục Ngữ</a>.</p>
 
 <a class="wg" id="wg" href="./" aria-label="Xem trước widget">
   <div class="top"><span class="lb">CÂU NGẪU NHIÊN</span><span id="wl"></span><span class="st" id="ws"></span></div>
@@ -61,15 +61,16 @@ a{color:var(--red)}
     <div class="row"><button class="btn primary" id="copy" disabled>Sao chép mã</button><span class="ok" id="copied"></span></div>
     <textarea id="code" readonly></textarea>
   </li>
-  <li>Mở Scriptable, bấm dấu <b>+</b> ở góc trên, dán mã vào. Bấm vào tên ở trên cùng, đổi thành <b>Kho Tục Ngữ</b>, rồi bấm <b>Done</b>. Bấm nút ▶ để chạy thử, sẽ thấy widget hiện ra.</li>
+  <li>Mở Scriptable, bấm dấu <b>+</b> ở góc trên, dán mã vào. Bấm vào tên ở trên cùng, đổi thành <b>Kho Tục Ngữ</b>, rồi bấm <b>Done</b>. Bấm nút ▶ để chạy thử, sẽ thấy widget hiện ra. Khi iPhone hỏi có cho Scriptable gửi thông báo không, chọn <b>Cho phép</b>.</li>
   <li>Ra màn hình chính, giữ tay vào chỗ trống đến khi các biểu tượng rung, bấm <b>+</b> (hoặc <b>Sửa → Thêm tiện ích</b>). Tìm <b>Scriptable</b>, vuốt sang cỡ <b>vừa</b> (ngang 4 ô, cao 2 ô), bấm <b>Thêm tiện ích</b>.</li>
   <li>Giữ tay vào widget vừa thêm, chọn <b>Sửa tiện ích</b>. Ở mục <b>Script</b> chọn <b>Kho Tục Ngữ</b>. Xong.</li>
 </ol>
 
 <h2>Tùy chọn</h2>
-<p>Muốn chỉ hiện một loại: trong <b>Sửa tiện ích</b>, ô <b>Parameter</b> gõ <code>tục ngữ</code>, <code>thành ngữ</code> hoặc <code>ca dao</code>. Có thể thêm nhiều widget, mỗi cái một loại.</p>
+<p>Muốn chỉ hiện một loại: trong <b>Sửa tiện ích</b>, ô <b>Parameter</b> gõ <code>tục ngữ</code>, <code>thành ngữ</code> hoặc <code>ca dao</code>. Có thể thêm nhiều widget, mỗi cái một loại. Thông báo cũng chỉ gửi loại câu đó.</p>
+<p>Không muốn nhận thông báo: vào <b>Cài đặt → Scriptable → Thông báo</b>, tắt <b>Cho phép thông báo</b>. Muốn đổi giờ: trong mã, sửa dòng <code>NOTIFY_TIMES</code> ở gần đầu, ví dụ <code>["07:30"]</code> là mỗi ngày một lần lúc 7:30.</p>
 
-<div class="note"><b>Lưu ý:</b> iPhone tự quyết định lúc nào làm mới widget, thường khoảng 15 phút đến vài giờ một lần, nên câu không đổi theo giờ cố định. Widget tải dữ liệu một lần mỗi tuần và vẫn chạy khi mất mạng.</div>
+<div class="note"><b>Lưu ý:</b> iPhone tự quyết định lúc nào làm mới widget, thường khoảng 15 phút đến vài giờ một lần, nên câu không đổi theo giờ cố định. Widget tải dữ liệu một lần mỗi tuần và vẫn chạy khi mất mạng. Thông báo được hẹn sẵn cho 10 ngày tới và tự hẹn thêm mỗi khi widget chạy, nên chỉ cần widget còn trên màn hình chính.</div>
 </main>
 <script>
 (function(){

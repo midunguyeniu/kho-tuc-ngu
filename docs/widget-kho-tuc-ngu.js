@@ -1,11 +1,15 @@
 // Kho Tục Ngữ, Thành Ngữ, Ca Dao Việt Nam: widget "Câu ngẫu nhiên" cho app Scriptable (iPhone).
 // Cỡ widget: vừa (4x2). Bấm vào widget để mở câu đó trên trang tra cứu.
 // Tùy chọn (Parameter khi sửa widget): "tục ngữ", "thành ngữ" hoặc "ca dao" để chỉ hiện một loại.
+// Thông báo: mỗi ngày một câu ngẫu nhiên vào các giờ trong NOTIFY_TIMES. Không muốn nhận thì đổi thành [].
 
 const BASE = "https://midunguyeniu.github.io/kho-tuc-ngu/";
 const DATA_URL = BASE + "widget.json";
 const MAX_AGE = 7 * 24 * 3600 * 1000; // tải lại dữ liệu mỗi tuần
 const REFRESH_MIN = 30;               // xin iOS đổi câu sau ~30 phút (iOS quyết định thời điểm thật)
+const NOTIFY_TIMES = ["08:00", "12:00", "20:00"];
+const NOTIFY_DAYS = 10;               // hẹn sẵn cho 10 ngày tới (iOS giữ tối đa 64 thông báo chờ cho cả app)
+const NOTIFY_PREFIX = "kho-tuc-ngu-";
 
 const C = {
   bg: Color.dynamic(new Color("#fffdf8"), new Color("#201c17")),
@@ -133,7 +137,58 @@ function buildWidget(e) {
   return w;
 }
 
+// hẹn thông báo: mỗi giờ trong NOTIFY_TIMES của NOTIFY_DAYS ngày tới có một thông báo (mã theo ngày giờ).
+// Thông báo đã hẹn thì giữ nguyên, chỉ hẹn thêm chỗ còn trống, và bỏ những cái không còn trong danh sách giờ.
+function slotId(d) {
+  const z = (n) => String(n).padStart(2, "0");
+  return NOTIFY_PREFIX + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + "-" + z(d.getHours()) + z(d.getMinutes());
+}
+
+function notifSlots(now) {
+  const out = [];
+  for (let k = 0; k < NOTIFY_DAYS; k++) {
+    for (const t of NOTIFY_TIMES) {
+      const [h, m] = t.split(":").map(Number);
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + k, h, m, 0, 0);
+      if (d.getTime() > now.getTime() + 60 * 1000) out.push(d);
+    }
+  }
+  return out;
+}
+
+async function scheduleNotifications(data, param) {
+  const pending = await Notification.allPending();
+  const mine = pending.map((n) => n.identifier).filter((i) => i && i.startsWith(NOTIFY_PREFIX));
+  const slots = notifSlots(new Date());
+  const want = new Set(slots.map(slotId));
+  const stale = mine.filter((i) => !want.has(i));
+  if (stale.length) await Notification.removePending(stale);
+  const have = new Set(mine);
+  for (const d of slots) {
+    const id = slotId(d);
+    if (have.has(id)) continue;
+    const e = pick(data, param);
+    const ls = lines(e.c);
+    const n = new Notification();
+    n.identifier = id;
+    n.threadIdentifier = "kho-tuc-ngu";
+    if (ls.length === 1) {
+      n.title = e.c;
+      n.body = [e.m, e.v ? "Ví dụ: " + e.v : ""].filter(Boolean).join("\n");
+    } else {
+      n.title = cap(e.l || "ca dao");
+      n.body = [ls.join("\n"), e.m].filter(Boolean).join("\n");
+    }
+    n.openURL = BASE + "?id=" + encodeURIComponent(e.i);
+    n.setTriggerDate(d);
+    await n.schedule();
+  }
+}
+
 const data = await loadData();
+if (data) {
+  try { await scheduleNotifications(data, args.widgetParameter); } catch (e) { /* chưa cho phép thông báo: bỏ qua */ }
+}
 const entry = data ? pick(data, args.widgetParameter) : null;
 const widget = buildWidget(entry);
 if (config.runsInWidget) {
