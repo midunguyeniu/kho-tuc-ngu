@@ -1,0 +1,8 @@
+# Repo công khai CHỈ chứa trang tra cứu (app/index.html).
+# Mọi thứ khác (sách PDF, ghi âm, ảnh slide, dữ liệu có nghĩa chép từ sách/web, file trung gian, script)
+# chỉ để trên máy vì có bản quyền hoặc là lời của người khác. Muốn thêm file nào thì mở thêm dòng "!" có chủ ý.
+/*
+!/.gitignore
+!/app/
+/app/*
+!/app/index.html
