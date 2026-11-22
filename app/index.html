@@ -208,7 +208,7 @@ const fold = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,
 const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const loaiCls = l => l==="thành ngữ"?"b-tn":l==="tục ngữ"?"b-tng":l==="ca dao"?"b-cd":"b-x";
 const loaiColor = l => l==="thành ngữ"?"var(--tn)":l==="tục ngữ"?"var(--tng)":l==="ca dao"?"var(--cd)":"var(--khac)";
-const meaning = e => e.nghia_bong || e.nghia || e.giai_nghia || (e.ai&&e.ai.y_nghia) || (e.xem?("Xem: "+e.xem):"");
+const meaning = e => e.nghia_bong || e.nghia || e.giai_nghia || (e.ai&&(e.ai.y_nghia||e.ai.cach_dung)) || (e.xem?("Xem: "+e.xem):"");  // bản chia sẻ không có nghĩa chép từ sách -> dùng phần AI viết
 
 // chỉ mục tìm kiếm
 const byId = {}, byKey = {};

@@ -6,3 +6,9 @@
 !/app/
 /app/*
 !/app/index.html
+# Bản chia sẻ công khai (GitHub Pages phục vụ thư mục docs/): trang + dữ liệu KHÔNG có chữ chép từ sách/web,
+# tạo bằng scripts/build_share.py (có bước kiểm chặn chữ sách lọt vào).
+!/docs/
+/docs/*
+!/docs/index.html
+!/docs/data.js

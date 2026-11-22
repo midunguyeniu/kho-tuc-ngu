@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23b3261e%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2218%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22%3EN%3C/text%3E%3C/svg%3E">
+<title>Kho Tục Ngữ, Thành Ngữ, Ca Dao Việt Nam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f1e7; --paper:#fffdf8; --ink:#1f1a14; --muted:#6f6556; --line:#e3d9c6;
+  --red:#b3261e; --red-soft:#f6dcd8;
+  --tn:#2f7d4a; --tng:#b3261e; --cd:#6a48b0; --khac:#6f6556; --badge-ink:#fff;
+  --ai:#2f5d8a; --ai-soft:#e3edf7; --chip:#efe7d7;
+  --shadow:0 1px 0 var(--line), 0 6px 18px rgba(60,40,10,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16130f; --paper:#201c17; --ink:#f1eadf; --muted:#a89d8b; --line:#3a332a;
+    --red:#ff7a6e; --red-soft:#3d1f1c; --tn:#63c48a; --tng:#ff7a6e; --cd:#b49cf2; --khac:#a89d8b; --badge-ink:#16130f;
+    --ai:#8fbcec; --ai-soft:#1b2a3a; --chip:#2b261f; --shadow:0 1px 0 var(--line);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16130f; --paper:#201c17; --ink:#f1eadf; --muted:#a89d8b; --line:#3a332a;
+  --red:#ff7a6e; --red-soft:#3d1f1c; --tn:#63c48a; --tng:#ff7a6e; --cd:#b49cf2; --khac:#a89d8b; --badge-ink:#16130f;
+  --ai:#8fbcec; --ai-soft:#1b2a3a; --chip:#2b261f; --shadow:0 1px 0 var(--line);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.alias{color:var(--red);font-size:12px;font-weight:400}
+mark{background:var(--red-soft);color:inherit;border-radius:3px;padding:0 2px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif;font-size:15px;line-height:1.55}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-family:Lora,serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-.01em}
+h1 span{color:var(--red)}
+.sub{color:var(--muted);font-size:13px}
+.today{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.today .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);font-weight:600}
+.today .q{font-family:Lora,serif;font-size:22px;font-weight:600;margin:4px 0;cursor:pointer;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.today .m{color:var(--muted);font-size:14px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* phần chữ: nhãn 17px + lề 8px + câu 2 dòng (22px x 1.4) + nghĩa 2 dòng (14px x 1.5); khoảng thừa nằm dưới cùng */
+.today > div:first-child{height:calc(17px + 8px + 2 * 22px * 1.4 + 2 * 14px * 1.5);overflow:hidden}
+/* khung câu ngẫu nhiên luôn cao cố định (câu 2 dòng + nghĩa 2 dòng) để phần bên dưới không bị đẩy lên xuống khi đổi câu */
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.controls{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:8px;margin-bottom:10px}
+.controls input,.controls select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.controls input:focus,.controls select:focus{outline:2px solid var(--red-soft);border-color:var(--red)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.count{color:var(--muted);font-size:13px;margin:4px 0 10px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
+.list{display:flex;flex-direction:column;gap:6px}
+/* máy tính: danh sách là khung cuộn riêng, dính giống khung chi tiết */
+.listpane{position:sticky;top:calc(var(--stick,0px) + 12px);max-height:calc(100vh - var(--stick,0px) - 24px);overflow:auto;padding:2px 4px 2px 2px}
+.item{scroll-margin-top:calc(var(--stick,0px) + 10px)}
+.item{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline}
+.item:hover{border-color:var(--muted)}
+.item.sel{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+.item .t{font-weight:500}
+.item .n{color:var(--muted);font-size:13px;grid-column:2/3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;transform:translateY(-1px)}
+.badge{font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;color:var(--badge-ink);white-space:nowrap}
+.b-tn{background:var(--tn)} .b-tng{background:var(--tng)} .b-cd{background:var(--cd)} .b-x{background:var(--khac)}
+.more{margin:10px auto;display:block}
+.detail{position:sticky;top:calc(var(--stick,0px) + 12px);background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow);max-height:calc(100vh - var(--stick,0px) - 24px);overflow:auto}
+/* khi cuộn: tiêu đề + thanh tìm/lọc dính ở đầu màn hình (chiều cao đo bằng JS -> --hh, --stick) */
+header{position:sticky;top:0;z-index:6;background:var(--bg);padding:10px 0}
+.stickybar{position:sticky;top:var(--hh,0px);z-index:5;background:var(--bg);padding-top:6px}
+.stickybar.stuck{box-shadow:0 8px 10px -10px rgba(0,0,0,.25)}
+.detail h2{font-family:Lora,serif;font-size:24px;line-height:1.3;margin:6px 0 10px;font-weight:600}
+.detail h2 .ln{display:block}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tag{background:var(--chip);border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer}
+.sec{margin-top:16px}
+.sec h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:600}
+.sec p{margin:0 0 6px}
+.quote{font-family:Lora,serif;font-style:italic;border-left:3px solid var(--line);padding-left:10px;margin:6px 0}
+.quote small{font-family:"Be Vietnam Pro";font-style:normal;color:var(--muted)}
+.ai{background:var(--ai-soft);border-radius:12px;padding:16px 18px;margin-top:18px;display:grid;gap:16px}
+.ai .blk h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ai);margin:0 0 6px;font-weight:600}
+.ai .blk p{margin:0}
+.ai .ex{font-family:Lora,serif;font-style:italic;font-size:15.5px;background:var(--paper);border-left:3px solid var(--ai);border-radius:0 8px 8px 0;padding:10px 14px}
+.ai .st{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center}
+.ai .st .k{font-size:12px;color:var(--muted)}
+.ai .st .v{display:flex;flex-wrap:wrap;gap:6px}
+.yt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:560px){.yt{grid-template-columns:repeat(2,1fr)}}
+.yti{display:flex;gap:8px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;opacity:.55}
+.yti.on{opacity:1;border-color:var(--ai)}
+.yti b{display:block;font-size:13px;font-weight:600}
+.yti small{display:block;font-size:12px;color:var(--muted);line-height:1.35}
+.yti .ck{flex:none;width:18px;height:18px;margin-top:1px;border-radius:50%;border:1.5px dashed var(--muted);display:grid;place-items:center}
+.yti.on .ck{border:none;background:var(--ai);color:var(--paper)}
+.yti .ck svg{width:12px;height:12px}
+.pill{font-size:12px;font-weight:500;border-radius:999px;padding:2px 10px;background:var(--paper);border:1px solid var(--line);cursor:pointer}
+.pill.pos{color:var(--tn);border-color:currentColor} .pill.neg{color:var(--tng);border-color:currentColor}
+.link{color:var(--red);cursor:pointer;text-decoration:underline;text-decoration-color:var(--red-soft);text-underline-offset:3px}
+.pop{display:inline-flex;align-items:center;gap:2px;vertical-align:middle}
+.pop svg{display:block;width:100%;height:100%}
+.pop .on{width:18px;height:18px;fill:var(--red)}
+.pop .off{width:12px;height:12px;fill:none;stroke:var(--muted);stroke-width:2;opacity:.6}
+.via{color:var(--muted);font-size:12px}
+.gloss{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.gloss b{font-weight:600}
+.alts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.alts li{padding-left:14px;position:relative}
+.alts li::before{content:"";position:absolute;left:2px;top:.7em;width:5px;height:5px;border-radius:50%;background:var(--muted)}
+.vianote{font-size:13px;color:var(--muted);background:var(--chip);border-radius:8px;padding:6px 10px;margin:-4px 0 12px}
+.src{font-size:12px;color:var(--muted);margin-top:16px;border-top:1px dashed var(--line);padding-top:10px}
+.src a{color:var(--ai)}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px}
+.close{display:none}
+@media (max-width:860px){
+  /* điện thoại: chỉ giữ ô tìm/lọc, để còn chỗ đọc */
+  header{position:static}
+  .stickybar{top:0;padding-top:8px}
+  .legend{margin-bottom:6px}
+  .legend .ld{display:none}
+  .controls{grid-template-columns:1fr 1fr}
+  .controls input{grid-column:1/3}
+  .layout{grid-template-columns:1fr}
+  .listpane{position:static;max-height:none;overflow:visible;padding:0}
+  .detail{position:fixed;inset:0;top:0;border-radius:0;max-height:none;z-index:10;display:none}
+  .detail.open{display:block}
+  .close{display:inline-block;margin-bottom:8px}
+  .today{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header id="hdr">
+    <div>
+      <h1>Kho <span>Tục Ngữ, Thành Ngữ, Ca Dao</span> Việt Nam</h1>
+      <div class="sub" id="stats"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="btnTheme" title="Đổi nền sáng/tối">◐</button>
+    </div>
+  </header>
+
+  <section class="today" id="today"></section>
+
+  <div class="stickybar" id="bar">
+  <div class="controls">
+    <input id="q" type="search" placeholder="Tìm chữ hoặc câu… (gõ có dấu để tìm đúng dấu)" autocomplete="off">
+    <select id="fLoai"><option value="">Mọi loại</option></select>
+    <select id="fChuDe"><option value="">Mọi chủ đề</option></select>
+    <select id="fSacThai">
+      <option value="">Mọi sắc thái</option>
+      <optgroup label="Biểu cảm">
+        <option value="tích cực">Tích cực, ngợi ca, khích lệ</option>
+        <option value="tiêu cực">Tiêu cực, phê phán, chê bai</option>
+        <option value="trung hòa">Trung hòa, khách quan</option>
+      </optgroup>
+      <optgroup label="Tu từ, hình tượng">
+        <option value="hình tượng">Hình tượng, gợi hình</option>
+        <option value="khoa trương">Khoa trương (nói quá)</option>
+        <option value="hài hước, châm biếm">Hài hước, châm biếm, mỉa mai</option>
+      </optgroup>
+      <optgroup label="Chức năng">
+        <option value="khuyên răn">Khuyên răn, giáo huấn</option>
+        <option value="đúc kết kinh nghiệm">Đúc kết kinh nghiệm</option>
+      </optgroup>
+    </select>
+    <select id="fPhoBien">
+      <option value="">Mọi mức phổ biến</option>
+      <option value="3">★★★ Rất thông dụng</option>
+      <option value="2">★★☆ Thông dụng vừa phải</option>
+      <option value="1">★☆☆ Cổ, ít thông dụng</option>
+    </select>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--tn)"></span> Thành ngữ<span class="ld">: cụm cố định, phải lắp vào câu</span></span>
+    <span><span class="dot" style="background:var(--tng)"></span> Tục ngữ<span class="ld">: câu trọn ý, đúc kết kinh nghiệm</span></span>
+    <span><span class="dot" style="background:var(--cd)"></span> Ca dao<span class="ld">: thơ dân gian, phần lớn lục bát</span></span>
+  </div>
+  </div>
+  <div class="count" id="count"></div>
+
+  <div class="layout">
+    <div class="listpane" id="listpane">
+      <div class="list" id="list"></div>
+      <button class="btn more" id="more" hidden>Xem thêm</button>
+    </div>
+    <aside class="detail" id="detail"><div class="empty">Chọn một câu để xem chi tiết.</div></aside>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+const D = window.DATA || [], NG = window.NGUON || {};
+const $ = s => document.querySelector(s);
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const fold = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").toLowerCase();
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const loaiCls = l => l==="thành ngữ"?"b-tn":l==="tục ngữ"?"b-tng":l==="ca dao"?"b-cd":"b-x";
+const loaiColor = l => l==="thành ngữ"?"var(--tn)":l==="tục ngữ"?"var(--tng)":l==="ca dao"?"var(--cd)":"var(--khac)";
+const meaning = e => e.nghia_bong || e.nghia || e.giai_nghia || (e.ai&&(e.ai.y_nghia||e.ai.cach_dung)) || (e.xem?("Xem: "+e.xem):"");  // bản chia sẻ không có nghĩa chép từ sách -> dùng phần AI viết
+
+// chỉ mục tìm kiếm
+const byId = {}, byKey = {};
+const keyOf = s => fold(s).replace(/[^\w\s]/g," ").replace(/\s+/g," ").trim();
+// Tách câu thành từng chữ (âm tiết). Giữ 2 bản: có dấu (chữ thường) và bỏ dấu.
+const low = s => (s||"").normalize("NFC").toLowerCase();
+const toks = s => low(s).match(/[\p{L}\p{N}]+/gu) || [];
+const hasMark = q => fold(q)!==low(q);   // người dùng có gõ dấu không
+D.forEach(e=>{
+  byId[e.id]=e;
+  e._t = toks(e.cau); e._tf = e._t.map(fold);
+  e._a = [...(e.bien_the||[]),...(e.ten_khac||[])].map(t=>({text:t, t:toks(t)})); e._a.forEach(a=>a.tf=a.t.map(fold));
+  const m=[meaning(e), e.nghia_den, e.ai&&e.ai.cach_dung].join(" ");
+  e._mt = toks(m); e._mtf = e._mt.map(fold);
+  [e.cau,...(e.bien_the||[]),...(e.ten_khac||[])].forEach(t=>{const k=keyOf(t); if(!byKey[k]) byKey[k]=e.id;});
+});
+
+// bộ lọc
+const uniq = (arr) => [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"vi"));
+[["tục ngữ","Tục ngữ"],["thành ngữ","Thành ngữ"],["ca dao","Ca dao"]].forEach(([v,t])=>$("#fLoai").add(new Option(t,v)));
+uniq(D.flatMap(e=>e.ai&&e.ai.chu_de||[])).forEach(v=>$("#fChuDe").add(new Option(v,v)));
+// sắc thái 3 nhóm: {bieu_cam, tu_tu[], chuc_nang[]} -> danh sách phẳng để lọc
+const stList = e => { const x=e.ai&&e.ai.sac_thai; if(!x||typeof x!=="object") return [];
+  return [x.bieu_cam, ...(x.tu_tu||[]), ...(x.chuc_nang||[])].filter(Boolean); };
+
+const st = {q:"",loai:"",chuDe:"",sac:"",pho:"",src:new Set(),shown:60,sel:null};
+const nLabeled = D.filter(e=>e.ai).length;
+$("#stats").textContent = `${D.length.toLocaleString("vi")} câu · ${nLabeled.toLocaleString("vi")} câu đã có nhãn chủ đề và cách dùng`;
+
+function match(e){
+  if(st.loai && e.loai!==st.loai) return false;
+  if(st.chuDe && !(e.ai&&e.ai.chu_de||[]).includes(st.chuDe)) return false;
+  if(st.sac && !stList(e).includes(st.sac)) return false;
+  if(st.pho){const p=e.ai&&e.ai.pho_bien; if(p!==+st.pho) return false;}
+  if(st.src.size && !e.nguon.some(s=>st.src.has(s))) return false;
+  return true;
+}
+// Tìm dãy chữ q (liên tiếp) trong mảng chữ t. Chữ cuối của q cho khớp phần đầu (đang gõ dở).
+function seqAt(t,q,prefixLast){
+  for(let i=0;i+q.length<=t.length;i++){
+    let ok=true;
+    for(let j=0;j<q.length;j++){
+      const last=j===q.length-1;
+      if(!(t[i+j]===q[j] || (prefixLast&&last&&t[i+j].startsWith(q[j])))){ok=false;break;}
+    }
+    if(ok) return i;
+  }
+  return -1;
+}
+function queryInfo(){
+  const raw=st.q.trim(); if(!raw) return null;
+  const accent=hasMark(raw);            // có dấu: so đúng dấu; không dấu: so bỏ dấu
+  const q=accent?toks(raw):toks(fold(raw));
+  return q.length?{accent,q}:null;
+}
+function search(){
+  const qi=queryInfo();
+  let res = D.filter(match);
+  if(qi){
+    const {accent,q}=qi, pick=(a,b)=>accent?a:b;
+    const scored=[];
+    for(const e of res){
+      const t=pick(e._t,e._tf);
+      let sc=0;
+      if(seqAt(t,q,false)>=0) sc=5;                                   // đúng chữ, ở bất kỳ vị trí nào trong câu
+      else if(seqAt(t,q,true)>=0) sc=4;                               // chữ cuối đang gõ dở
+      else if(e._a.some(a=>seqAt(pick(a.t,a.tf),q,true)>=0)) sc=3;     // khớp cách nói khác
+      else if(q.every(w=>t.includes(w))) sc=2;                        // đủ các chữ nhưng không liền nhau
+      else if(seqAt(pick(e._mt,e._mtf),q,false)>=0) sc=1;             // khớp trong phần nghĩa
+      if(sc) scored.push([sc,e]);
+    }
+    scored.sort((a,b)=>b[0]-a[0] || (b[1].ai?.pho_bien||0)-(a[1].ai?.pho_bien||0) || a[1].cau.length-b[1].cau.length);
+    res=scored.map(x=>x[1]);
+  } else {
+    res.sort((a,b)=>(b.ai?.pho_bien||0)-(a.ai?.pho_bien||0) || a.cau.localeCompare(b.cau,"vi"));
+  }
+  return res;
+}
+// Tô màu các chữ khớp với từ khoá
+function hl(text,qi){
+  if(!qi) return esc(text);
+  const set=new Set(qi.q);
+  return text.split(/([\p{L}\p{N}]+)/u).map((part,i)=>{
+    if(i%2===0) return esc(part);
+    const k=qi.accent?low(part):fold(part);
+    return set.has(k)?`<mark>${esc(part)}</mark>`:esc(part);
+  }).join("");
+}
+let results=[];
+function render(){
+  results = search();
+  $("#count").textContent = `${results.length.toLocaleString("vi")} kết quả` + (st.q?"":" · xếp câu thông dụng lên trước");
+  const list=$("#list"); list.innerHTML="";
+  if(!results.length){list.innerHTML='<div class="empty">Không có câu nào khớp.</div>';}
+  const qi=queryInfo();
+  const aliasOf=e=>{ if(!qi) return "";
+    const pick=(a,b)=>qi.accent?a:b;
+    if(seqAt(pick(e._t,e._tf),qi.q,true)>=0) return "";
+    const a=e._a.find(a=>seqAt(pick(a.t,a.tf),qi.q,true)>=0); return a?a.text:""; };
+  results.slice(0,st.shown).forEach(e=>{
+    const d=document.createElement("div"); const al=aliasOf(e);
+    d.className="item"+(st.sel===e.id?" sel":""); d.dataset.id=e.id;
+    d.innerHTML=`<span class="dot" style="background:${loaiColor(e.loai)}" title="${esc(e.loai||"chưa phân loại")}"></span>
+      <span class="t">${e.cau.split(" / ").slice(0,2).map(l=>hl(l,qi)).join("<br>")}${e.cau.split(" / ").length>2?" …":""}${al?` <span class="alias">· cũng nói: ${hl(al,qi)}</span>`:""}</span>
+      <span class="n">${esc(meaning(e))}</span>`;
+    d.onclick=()=>show(e.id,null,true);
+    list.appendChild(d);
+  });
+  $("#more").hidden = results.length<=st.shown;
+}
+const STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
+const POP_TXT={1:"cổ, ít thông dụng",2:"thông dụng vừa phải",3:"rất thông dụng"};
+function popStars(p){return p?`<span class="pop" title="Mức phổ biến: ${POP_TXT[p]} (AI ước lượng)" aria-label="Mức phổ biến ${p}/3">`+
+  `<span class="on">${STAR}</span>`.repeat(p)+`<span class="off">${STAR}</span>`.repeat(3-p)+"</span>":""}
+function refLink(t){
+  const id=byKey[keyOf(t)];
+  if(!id||id===st.sel) return esc(t);
+  const tg=byId[id]; const other=keyOf(tg.cau)!==keyOf(t);
+  const short=tg.cau.split(" / ")[0];
+  return `<span class="link" data-go="${id}" data-via="${esc(t)}">${esc(t)}</span>`+
+    (other?` <small class="via">→ là cách nói khác của «${esc(short)}»</small>`:"");
+}
+// 6 yếu tố làm một câu dính vào trí nhớ (slide buổi học): tick nếu câu có, kèm bằng chứng ngắn
+const YT=[["nhip","Nhịp","ngắt nghỉ"],["van","Vần","chữ bắt tay nhau"],["doi","Đối","hai vế song song"],
+  ["lap","Lặp, láy","chữ/âm lặp lại"],["hinh_anh","Hình ảnh","thấy được, sờ được"],["nghia_bong","Nghĩa bóng","nói A hiểu B"]];
+const CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function yeuTo(y){
+  if(!y) return "";
+  const n=YT.filter(([k])=>y[k]).length;
+  return `<div class="blk"><h3>Yếu tố dễ nhớ · ${n}/6</h3><div class="yt">${YT.map(([k,t,hint])=>{
+    const on=!!y[k]; const ev=typeof y[k]==="string"&&y[k]&&y[k]!=="có"?y[k]:"";
+    return `<div class="yti${on?" on":""}"><span class="ck">${on?CHECK:""}</span><span><b>${t}</b><small>${on&&ev?esc(ev):hint}</small></span></div>`;
+  }).join("")}</div></div>`;
+}
+// "An: yên; Cư: ở; Lạc: vui" -> mỗi từ một dòng. Chỉ tách ở "; " khi đoạn sau bắt đầu bằng "từ: ",
+// để không cắt nhầm định nghĩa có dấu chấm phẩy bên trong (vd "Môi mè: môi cá mè; ăn béo, không tanh").
+const GLOSS_HEAD=/^([^:;,.“”"]{1,45}):\s+(.*)$/s;   // cho phép ngoặc trong từ, vd "răng (phương ngữ Trung Bộ): sao"
+function glossHtml(t){
+  const parts=[];
+  for(const seg of t.split(/;\s+/)){
+    if(GLOSS_HEAD.test(seg)||!parts.length) parts.push(seg); else parts[parts.length-1]+="; "+seg;
+  }
+  if(parts.length<2&&!GLOSS_HEAD.test(t)) return `<p>${esc(t)}</p>`;
+  return `<ul class="gloss">${parts.map(x=>{const m=x.match(GLOSS_HEAD);
+    return `<li>${m?`<b>${esc(m[1])}</b>: ${esc(m[2])}`:esc(x)}</li>`;}).join("")}</ul>`;
+}
+function show(id,via,fromList){
+  const e=byId[id]; if(!e) return;
+  const viaKey=via&&keyOf(via)!==keyOf(e.cau)?keyOf(via):null;
+  st.sel=id;
+  const ai=e.ai||{};
+  const lines=e.cau.split(" / ").map(l=>`<span class="ln">${esc(l)}</span>`).join("");
+  let h=`<button class="btn close" id="btnClose">← Quay lại</button>
+  <div class="meta">${e.loai?`<span class="badge ${loaiCls(e.loai)}">${esc(e.loai.charAt(0).toUpperCase()+e.loai.slice(1))}</span>`:'<span class="badge b-x">Chưa phân loại</span>'}
+    ${(ai.chu_de||[]).map(c=>`<span class="tag" data-cd="${esc(c)}">${esc(c)}</span>`).join("")}
+    ${popStars(ai.pho_bien)}</div>
+  <h2>${lines}</h2>${viaKey?`<div class="vianote">Bạn vừa bấm «${esc(via)}», một cách nói khác của câu này (xem mục «Cách nói khác» bên dưới).</div>`:""}`;
+  const secs=[];
+  if(e.nghia_den) secs.push(["Nghĩa đen",`<p>${esc(e.nghia_den)}</p>`]);
+  if(e.nghia_bong) secs.push(["Nghĩa bóng",`<p>${esc(e.nghia_bong)}</p>`]);
+  if(e.nghia) secs.push(["Nghĩa",`<p>${esc(e.nghia)}</p>`]);
+  if(e.giai_nghia) secs.push(["Giải nghĩa",`<p>${esc(e.giai_nghia)}</p>`]);
+  (e.giai_nghia_khac||[]).forEach(g=>secs.push([`Giải nghĩa thêm (${g.nguon==="bv"?"Bùi Văn Vượng":"Vũ Ngọc Phan"})`,`<p>${esc(g.text)}</p>`]));
+  if(e.loi_dan_sach) secs.push(["Lời dẫn của sách",`<p>${esc(e.loi_dan_sach)}</p>`]);
+  if(e.chu_thich) secs.push(["Chú thích từ khó",glossHtml(e.chu_thich)]);
+  if(e.xem) secs.push(["Xem câu",`<p>${refLink(e.xem)}</p>`]);
+  const alts=[...(e.bien_the||[]),...(e.ten_khac||[])].filter((t,i,a)=>a.findIndex(u=>keyOf(u)===keyOf(t))===i && keyOf(t)!==keyOf(e.cau));
+  if(alts.length) secs.push(["Cách nói khác",`<ul class="alts">${alts.map(a=>{const t=a.split(" / ").map(esc).join("<br>");
+    return `<li>${keyOf(a)===viaKey?`<mark>${t}</mark>`:t}</li>`;}).join("")}</ul>`]);
+  if(e.gan_nghia) secs.push(["Câu gần nghĩa",`<p>${e.gan_nghia.map(refLink).join(" · ")}</p>`]);
+  if(e.vi_du_sach) secs.push(["Trích dẫn trong văn chương",e.vi_du_sach.map(v=>`<div class="quote">${esc(v.trich)}${v.nguon?` <small>(${esc(v.nguon==="cd"?"ca dao":v.nguon)})</small>`:""}</div>`).join("")]);
+  if(e.tham_khao) secs.push(["Tham khảo",`<p>${esc(e.tham_khao)}</p>`]);
+  if(e.muc_sach) secs.push(["Mục trong sách",`<p>${esc(e.muc_sach)}</p>`]);
+  h+=secs.map(([t,c])=>`<div class="sec"><h3>${t}</h3>${c}</div>`).join("");
+  if(ai.cach_dung||ai.vi_du||ai.y_nghia){
+    const pill=v=>`<span class="pill${v==="tích cực"?" pos":v==="tiêu cực"?" neg":""}" data-st="${esc(v)}" title="Lọc theo sắc thái này">${esc(v)}</span>`;
+    const x=ai.sac_thai&&typeof ai.sac_thai==="object"?ai.sac_thai:null;
+    const rows=x?[["Biểu cảm",[].concat(x.bieu_cam||[])],["Tu từ",x.tu_tu||[]],["Chức năng",x.chuc_nang||[]]].filter(r=>r[1].length):[];
+    h+=`<div class="ai">
+      ${ai.y_nghia?`<div class="blk"><h3>Ý nghĩa</h3><p>${esc(ai.y_nghia)}</p></div>`:""}
+      ${ai.cach_dung?`<div class="blk"><h3>Dùng khi nào</h3><p>${esc(ai.cach_dung)}</p></div>`:""}
+      ${ai.vi_du?`<div class="blk"><h3>Ví dụ</h3><p class="ex">“${esc(ai.vi_du)}”</p></div>`:""}
+      ${rows.length?`<div class="blk"><h3>Sắc thái</h3><div class="st">${rows.map(([k,v])=>`<span class="k">${k}</span><span class="v">${v.map(pill).join("")}</span>`).join("")}</div></div>`:""}
+      ${yeuTo(ai.yeu_to)}
+    </div>`;
+  }
+  h+=`<div class="src">Nguồn: ${e.nguon.filter(s=>s!=="bh").map(s=>esc(NG[s]||s)+(e.trang&&e.trang[s]?`, tr. PDF ${e.trang[s]}`:"")+(s==="lg"&&e.url_lg?` · <a href="${esc(e.url_lg)}" target="_blank" rel="noopener">xem giải nghĩa trên web ↗</a>`:"")).join("<br>")||"câu bổ sung, không có trong các nguồn sách"}${e.khong_chac?"<br>⚠ Có chữ đọc từ bản scan chưa chắc chắn.":""}${e.da_sua_tay?`<br>✎ Đã sửa tay:${esc(e.da_sua_tay)}`:""}</div>`;
+  const det=$("#detail"); det.innerHTML=h; det.classList.add("open"); det.scrollTop=0;
+  det.querySelectorAll("[data-go]").forEach(a=>a.onclick=()=>show(a.dataset.go,a.dataset.via));
+  det.querySelectorAll("[data-st]").forEach(a=>a.onclick=()=>{st.sac=a.dataset.st;$("#fSacThai").value=st.sac;st.shown=60;render();});
+  det.querySelectorAll("[data-cd]").forEach(a=>a.onclick=()=>{st.chuDe=a.dataset.cd;$("#fChuDe").value=st.chuDe;st.shown=60;render();});
+  const c=$("#btnClose"); if(c) c.onclick=()=>det.classList.remove("open");
+  document.querySelectorAll(".item").forEach(n=>n.classList.remove("sel"));
+  render();
+  if(!fromList) revealInList(id);
+}
+// đưa câu đang xem lên đầu danh sách bên trái (mở thêm trang nếu câu nằm xa; câu bị bộ lọc ẩn thì thôi)
+function revealInList(id){
+  const idx=results.findIndex(x=>x.id===id); if(idx<0) return;
+  if(idx>=st.shown){ st.shown=Math.ceil((idx+1)/60)*60; render(); }
+  const el=$("#list").querySelector(`[data-id="${id}"]`), pane=$("#listpane"); if(!el) return;
+  if(getComputedStyle(pane).overflowY==="auto") pane.scrollTop+=el.getBoundingClientRect().top-pane.getBoundingClientRect().top-2;
+  else el.scrollIntoView({block:"start"});
+}
+// câu ngẫu nhiên: ưu tiên câu thông dụng có cách dùng; bấm "Xem câu khác" để đổi câu, bấm vào câu để xem chi tiết
+let lastRand=null;
+function today(){
+  const pool=D.filter(e=>e.ai&&e.ai.pho_bien>=2&&e.ai.vi_du);
+  const src=pool.length?pool:D;
+  if(!src.length){$("#today").hidden=true;return;}
+  let e; do{ e=src[Math.floor(Math.random()*src.length)]; }while(src.length>1&&e===lastRand);
+  lastRand=e;
+  $("#today").innerHTML=`<div><div class="lbl">Câu ngẫu nhiên</div>
+    <div class="q" id="tq" title="Xem chi tiết câu này">${e.cau.split(" / ").map(esc).join("<br>")}</div>
+    <div class="m">${esc(meaning(e))}</div></div>
+    <button class="btn primary" id="tBtn">Xem câu khác</button>`;
+  $("#tq").onclick=()=>show(e.id);
+  $("#tBtn").onclick=()=>{today(); show(lastRand.id);};   // đổi câu và mở luôn chi tiết bên dưới
+}
+
+// sự kiện
+let t; $("#q").addEventListener("input",ev=>{clearTimeout(t);t=setTimeout(()=>{st.q=ev.target.value;st.shown=60;render();},120);});
+$("#fLoai").onchange=ev=>{st.loai=ev.target.value;st.shown=60;render();};
+$("#fChuDe").onchange=ev=>{st.chuDe=ev.target.value;st.shown=60;render();};
+$("#fSacThai").onchange=ev=>{st.sac=ev.target.value;st.shown=60;render();};
+$("#fPhoBien").onchange=ev=>{st.pho=ev.target.value;st.shown=60;render();};
+$("#more").onclick=()=>{st.shown+=60;render();};
+const th=store.get("theme",null); if(th) document.documentElement.dataset.theme=th;
+$("#btnTheme").onclick=()=>{const dark=matchMedia("(prefers-color-scheme: dark)").matches;const cur=document.documentElement.dataset.theme||(dark?"dark":"light");const nx=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=nx;store.set("theme",nx);};
+today(); render();
+// đo chiều cao phần dính để phần chi tiết bên phải không bị che
+(function(){
+  const hdr=$("#hdr"), bar=$("#bar"), root=document.documentElement;
+  const measure=()=>{const hh=getComputedStyle(hdr).position==="sticky"?hdr.offsetHeight:0; root.style.setProperty("--hh",hh+"px");root.style.setProperty("--stick",(hh+bar.offsetHeight)+"px");};
+  measure(); if(window.ResizeObserver){const ro=new ResizeObserver(measure); ro.observe(hdr); ro.observe(bar);} else addEventListener("resize",measure);
+  addEventListener("scroll",()=>bar.classList.toggle("stuck",scrollY>0&&bar.getBoundingClientRect().top<=parseFloat(getComputedStyle(root).getPropertyValue("--hh"))+1),{passive:true});
+})();
+})();
+</script>
+</body>
+</html>
