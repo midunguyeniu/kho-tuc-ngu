@@ -219,27 +219,79 @@ async function scheduleNotifications(data, param) {
   for (const d of slots) {
     const id = slotId(d);
     if (have.has(id)) continue;
-    const e = pick(data, param);
-    const ls = lines(e.c);
-    const n = new Notification();
-    n.identifier = id;
-    n.threadIdentifier = "kho-tuc-ngu";
-    if (ls.length === 1) {
-      n.title = e.c;
-      n.body = [e.m, e.v ? "Ví dụ: " + e.v : ""].filter(Boolean).join("\n");
-    } else {
-      n.title = cap(e.l || "ca dao");
-      n.body = [ls.join("\n"), e.m].filter(Boolean).join("\n");
-    }
-    n.openURL = BASE + "?id=" + encodeURIComponent(e.i);
+    const n = makeNotification(pick(data, param), id);
     n.setTriggerDate(d);
     await n.schedule();
   }
 }
 
+// nội dung thông báo: câu một dòng thì câu làm tiêu đề; ca dao thì các dòng thơ nằm trong nội dung
+function makeNotification(e, id) {
+  const ls = lines(e.c);
+  const n = new Notification();
+  n.identifier = id;
+  n.threadIdentifier = "kho-tuc-ngu";
+  if (ls.length === 1) {
+    n.title = e.c;
+    n.body = [e.m, e.v ? "Ví dụ: " + e.v : ""].filter(Boolean).join("\n");
+  } else {
+    n.title = cap(e.l || "ca dao");
+    n.body = [ls.join("\n"), e.m].filter(Boolean).join("\n");
+  }
+  n.openURL = BASE + "?id=" + encodeURIComponent(e.i);
+  return n;
+}
+
+async function showInfo(title, message) {
+  const a = new Alert();
+  a.title = title;
+  a.message = message;
+  a.addAction("OK");
+  await a.presentAlert();
+}
+
+// menu khi bấm ▶ trong app: xem trước widget, gửi thử thông báo, xem lịch thông báo đã hẹn
+async function appMenu(data, widget) {
+  while (true) {
+    const a = new Alert();
+    a.title = "Kho Tục Ngữ";
+    a.message = notifError
+      ? "Chưa gửi được thông báo. Vào Cài đặt → Scriptable → Thông báo, bật Cho phép thông báo."
+      : "Widget và thông báo đã sẵn sàng.";
+    a.addAction("Xem trước widget");
+    a.addAction("Gửi thử 1 thông báo (sau 10 giây)");
+    a.addAction("Xem lịch thông báo đã hẹn");
+    a.addCancelAction("Đóng");
+    const i = await a.presentSheet();
+    if (i === 0) {
+      await widget.presentMedium();
+    } else if (i === 1) {
+      if (!data) { await showInfo("Chưa có dữ liệu", "Kiểm tra mạng rồi chạy lại."); continue; }
+      try {
+        const n = makeNotification(pick(data, args.widgetParameter), "ktn-thu-" + Date.now());
+        n.setTriggerDate(new Date(Date.now() + 10 * 1000));
+        await n.schedule();
+        await showInfo("Đã hẹn thông báo thử", "Bấm OK rồi về màn hình chính hoặc khóa máy, khoảng 10 giây sau thông báo sẽ hiện.");
+        return;
+      } catch (e) {
+        await showInfo("Không gửi được", "Vào Cài đặt → Scriptable → Thông báo, bật Cho phép thông báo, rồi thử lại.");
+      }
+    } else if (i === 2) {
+      const mine = (await Notification.allPending()).filter((n) => (n.identifier || "").startsWith(NOTIFY_PREFIX));
+      const times = mine.map((n) => n.identifier.slice(NOTIFY_PREFIX.length)).sort().slice(0, 3)
+        .map((s) => `${s.slice(9, 11)}:${s.slice(11, 13)} ngày ${s.slice(6, 8)}/${s.slice(4, 6)}`);
+      await showInfo(`Đã hẹn ${mine.length} thông báo`,
+        mine.length ? "Sắp tới: " + times.join(", ") : "Chưa có thông báo nào. Kiểm tra quyền thông báo trong Cài đặt → Scriptable.");
+    } else {
+      return;
+    }
+  }
+}
+
+let notifError = null;
 const data = await loadData();
 if (data) {
-  try { await scheduleNotifications(data, args.widgetParameter); } catch (e) { /* chưa cho phép thông báo: bỏ qua */ }
+  try { await scheduleNotifications(data, args.widgetParameter); } catch (e) { notifError = e; /* chưa cho phép thông báo */ }
 }
 const family = config.widgetFamily;
 let widget;
@@ -254,6 +306,8 @@ if (family === "accessoryRectangular") {
 }
 if (config.runsInWidget) {
   Script.setWidget(widget);
+} else if (config.runsInApp) {
+  await appMenu(data, widget);
 } else {
   await widget.presentMedium();
 }
