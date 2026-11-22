@@ -43,6 +43,7 @@ h1 span{color:var(--red)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fromtop{color:var(--red);font-size:13px;padding:2px 2px 6px;cursor:pointer}
 .count{color:var(--muted);font-size:13px;margin:4px 0 10px}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
 .list{display:flex;flex-direction:column;gap:6px}
@@ -216,7 +217,7 @@ uniq(D.flatMap(e=>e.ai&&e.ai.chu_de||[])).forEach(v=>$("#fChuDe").add(new Option
 const stList = e => { const x=e.ai&&e.ai.sac_thai; if(!x||typeof x!=="object") return [];
   return [x.bieu_cam, ...(x.tu_tu||[]), ...(x.chuc_nang||[])].filter(Boolean); };
 
-const st = {q:"",loai:"",chuDe:"",sac:"",pho:"",src:new Set(),shown:60,sel:null};
+const st = {q:"",loai:"",chuDe:"",sac:"",pho:"",src:new Set(),shown:60,sel:null,from:null,fromSig:null};
 const nLabeled = D.filter(e=>e.ai).length;
 $("#stats").textContent = `${D.length.toLocaleString("vi")} câu · ${nLabeled.toLocaleString("vi")} câu đã có nhãn chủ đề và cách dùng`;
 
@@ -285,12 +286,22 @@ function render(){
   $("#count").textContent = `${results.length.toLocaleString("vi")} kết quả` + (st.q?"":" · xếp câu thông dụng lên trước");
   const list=$("#list"); list.innerHTML="";
   if(!results.length){list.innerHTML='<div class="empty">Không có câu nào khớp.</div>';}
+  // điện thoại: danh sách bắt đầu từ câu ngẫu nhiên đang hiện (đổi tìm kiếm/bộ lọc thì về đầu)
+  const sig=JSON.stringify([st.q,st.loai,st.chuDe,st.sac,st.pho]);
+  if(st.from&&st.fromSig!==sig) st.from=null;
+  let start=st.from?Math.max(0,results.findIndex(x=>x.id===st.from)):0;
+  if(start>0){
+    const b=document.createElement("div"); b.className="fromtop";
+    b.textContent=`↑ Xem từ đầu danh sách (${start.toLocaleString("vi")} câu phía trước)`;
+    b.onclick=()=>{st.from=null;st.shown=60;render();};
+    list.appendChild(b);
+  }
   const qi=queryInfo();
   const aliasOf=e=>{ if(!qi) return "";
     const pick=(a,b)=>qi.accent?a:b;
     if(seqAt(pick(e._t,e._tf),qi.q,true)>=0) return "";
     const a=e._a.find(a=>seqAt(pick(a.t,a.tf),qi.q,true)>=0); return a?a.text:""; };
-  results.slice(0,st.shown).forEach(e=>{
+  results.slice(start,start+st.shown).forEach(e=>{
     const d=document.createElement("div"); const al=aliasOf(e);
     d.className="item"+(st.sel===e.id?" sel":""); d.dataset.id=e.id;
     d.innerHTML=`<span class="dot" style="background:${loaiColor(e.loai)}" title="${esc(e.loai||"chưa phân loại")}"></span>
@@ -299,7 +310,7 @@ function render(){
     d.onclick=()=>show(e.id,null,true);
     list.appendChild(d);
   });
-  $("#more").hidden = results.length<=st.shown;
+  $("#more").hidden = results.length<=start+st.shown;
 }
 const STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>';
 const POP_TXT={1:"cổ, ít thông dụng",2:"thông dụng vừa phải",3:"rất thông dụng"};
@@ -404,13 +415,14 @@ function today(){
   if(!src.length){$("#today").hidden=true;return;}
   let e; do{ e=src[Math.floor(Math.random()*src.length)]; }while(src.length>1&&e===lastRand);
   lastRand=e;
+  if(matchMedia("(max-width:860px)").matches){ st.from=e.id; st.fromSig=JSON.stringify([st.q,st.loai,st.chuDe,st.sac,st.pho]); st.shown=60; }
   $("#today").innerHTML=`<div><div class="lbl">Câu ngẫu nhiên</div>
     <div class="q" id="tq" title="Xem chi tiết câu này">${e.cau.split(" / ").map(esc).join("<br>")}</div>
     <div class="m">${esc(meaning(e))}</div></div>
     <button class="btn primary" id="tBtn">Xem câu khác</button>`;
   $("#tq").onclick=()=>show(e.id);
   // đổi câu; máy tính thì mở luôn chi tiết bên phải, điện thoại chỉ đổi câu (bấm vào câu mới mở chi tiết)
-  $("#tBtn").onclick=()=>{today(); if(!matchMedia("(max-width:860px)").matches) show(lastRand.id);};
+  $("#tBtn").onclick=()=>{today(); if(matchMedia("(max-width:860px)").matches) render(); else show(lastRand.id);};
 }
 
 // sự kiện
